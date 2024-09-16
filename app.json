@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "ClamscannerApp",
+    "name": "Clam Scanner",
     "slug": "ClamscannerApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/clam_logo.png",
+    "icon": "./assets/images/clam_app_logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -17,9 +17,16 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/clam_app_logo.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.johnkristanf.ClamscannerApp",
+      "permissions": [
+        "INTERNET",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -32,6 +39,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3786d311-c48a-40fe-841f-13fbe19db1dd"
+      }
     }
   }
 }

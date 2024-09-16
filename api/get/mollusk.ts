@@ -1,5 +1,4 @@
 import { MolluskSightingsType } from "@/types/mollusk";
-import { ReportedCasesTypes } from "@/types/reports";
 import axios from "axios";
 
 export async function FetchMolluskCommonSightings(scientificName: string): Promise<MolluskSightingsType[] | undefined> {

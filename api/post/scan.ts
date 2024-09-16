@@ -1,27 +1,33 @@
 import axios from "axios";
 
-export const Scan = async (capturedImageFormData: FormData) => {
-    try {
+export const Scan = async (capturedImageFormData: FormData, setCancelOrReported: React.Dispatch<React.SetStateAction<boolean>>) => {
 
-        const response = await axios.post("http://192.168.43.252:5000/image/scan", capturedImageFormData, {
+    console.log("setCancelOrReported:", setCancelOrReported)
+
+    try {
+        const response = await axios.post("https://clamscanner.com/py/image/scan", capturedImageFormData, {
             headers: { 
                 'Content-Type': 'multipart/form-data',
-            }
+            },
+            timeout: 10000,
         });
 
+        if (response.status === 200) return response.data;
 
-        if(response.status === 200) return response.data
-        
-    } catch (error) {
-        console.log("ERROR IN AXIOS REQUEST SCAN newly shess")
-        console.error(error)
+    } catch (error: any) {
+        console.log("ERROR IN AXIOS REQUEST SCAN");
+        console.error(error.message || error); 
+
+        return false;
+
     }
 }
+
 
 export const FetchMolluskDetails = async (mollusk_name:string) => {
     try {
 
-        const response = await axios.get(`http://192.168.43.252:8080/fetch/mollusk/${mollusk_name}`, {
+        const response = await axios.get(`https://clamscanner.com/go/fetch/mollusk/${mollusk_name}`, {
             headers: { 
                 'Content-Type': 'application/json'
             }

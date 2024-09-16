@@ -8,10 +8,11 @@ import { resizeImage } from '@/helpers/resize';
 import { FetchMolluskDetails, Scan } from '@/api/post/scan';
 import Colors from '@/constants/Colors';
 
-export function OpenCamera({ setImageForScanning, setIsOpenCamera, setScannedData }: {
+export function OpenCamera({ setImageForScanning, setIsOpenCamera, setScannedData, setCancelOrReported }: {
     setImageForScanning: React.Dispatch<React.SetStateAction<string | undefined>>,
     setIsOpenCamera: React.Dispatch<React.SetStateAction<boolean>>,
     setScannedData: React.Dispatch<React.SetStateAction<MolluskScannedDetails | undefined>>,
+    setCancelOrReported: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const cameraRef = useRef<CameraView>(null);
     const [camFacing, setCamFacing] = useState<string>('back');
@@ -41,13 +42,31 @@ export function OpenCamera({ setImageForScanning, setIsOpenCamera, setScannedDat
                             type: 'image/jpeg',
                         } as any);
 
-                        const scanRespData = await Scan(formData);
+                        const scanRespData = await Scan(formData, setCancelOrReported);
+                        console.log("scanRespData: ", scanRespData)
 
                         if (scanRespData) {
                             FetchMolluskDetails(scanRespData.mollusk_classified_result)
                                 .then(molluskDetails => setScannedData(molluskDetails))
                                 .catch(err => console.error(err));
+
+                        } else {
+                            const errorMsg = "Request timeout due to slow internet connection, you will be redirected back and try to scan again.";
+                            Alert.alert(
+                                "Error in Scanning", 
+                                errorMsg,
+
+                                [
+                                    {
+                                    text: "Return",
+                                    onPress: () => setCancelOrReported(true),
+                                    },
+                                ],
+
+                                { cancelable: false }
+                            );
                         }
+
                     } catch (error) {
                         console.error(error);
                         console.log("ERROR NEWTOWK DOLL");

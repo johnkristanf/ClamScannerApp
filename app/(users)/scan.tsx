@@ -59,6 +59,7 @@ export default function ScanPage() {
                     setImageForScanning={setImageForScanning}
                     setIsOpenCamera={setIsOpenCamera}
                     setScannedData={setScannedData}
+                    setCancelOrReported={setCancelOrReported}
                 />
 
             ) : imageForScanning && !scannedData ? (
@@ -84,7 +85,7 @@ export default function ScanPage() {
 
                     <Pressable
                         style={styles.flex_row_center}
-                        onPress={() => openGallery(setImageForScanning, setScannedData)}
+                        onPress={() => openGallery(setImageForScanning, setScannedData, setCancelOrReported)}
                     >
                         <Image source={require('../../assets/images/open_gallery_icon.png')} />
                         <Text style={styles.text}>Upload Gallery</Text>

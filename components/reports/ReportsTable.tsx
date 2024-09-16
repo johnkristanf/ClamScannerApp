@@ -62,7 +62,15 @@ function ReportsTable({setResolved, setRegion, setReportsModal}: {
 
   const renderItem = ({ item }: { item: ReportedCasesTypes }) => (
     <View style={styles.row}>
-      <Text style={styles.item}>{item.city} {item.district} {item.province}</Text>
+      <Text 
+        style={styles.item}
+        numberOfLines={1} // Limits text to 1 line
+        ellipsizeMode="tail" // Adds ellipsis at the end if text overflows
+      >
+        {item.city} {item.district} {item.province}
+      </Text>
+
+      <Text style={styles.item}>{item.mollusk_type}</Text>
 
       <Button title="View Map" onPress={() => ViewMapLocation(item.longitude, item.latitude)} color="#2196F3" />
       {
@@ -76,8 +84,9 @@ function ReportsTable({setResolved, setRegion, setReportsModal}: {
 
   const renderHeader = () => (
     <View style={styles.headerRow}>
-      <Text style={styles.headerItem}>Reported Address</Text>
-      <View style={{flexDirection: 'row', justifyContent: 'center', width: '50%'}}>
+      <Text style={styles.headerItem}>Address</Text>
+      <Text style={styles.headerItem}>Type</Text>
+      <View style={{flexDirection: 'row', justifyContent: 'center', width: '40%'}}>
       <Text style={styles.headerItem}>Actions</Text>
 
       </View>
@@ -124,8 +133,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 20,
-    width: '100%'
+    width: '100%',
+    gap: 3
   },
 
   headerRow: {
@@ -145,11 +156,12 @@ const styles = StyleSheet.create({
 
   item: {
     fontSize: 13,
+    width: '25%'
   },
 
   resolved_text: {
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 18,
     color: 'green'
   }
 });

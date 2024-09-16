@@ -8,8 +8,8 @@ import { RegionType } from "@/types/reports";
 const initialRegion = {
     latitude: 7.3042,
     longitude: 126.0893,
-    latitudeDelta: 2.2022,
-    longitudeDelta: 2.2021,
+    latitudeDelta: 1.7022,
+    longitudeDelta: 1.7021,
 };
 
 // Lazy load the ReportsModal and ReportsMap components

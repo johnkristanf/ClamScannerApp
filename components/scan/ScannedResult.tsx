@@ -21,7 +21,11 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
   setCancelOrReported: React.Dispatch<React.SetStateAction<boolean>>
 }){
 
-  const statusTextColor = scannedData && (scannedData.status === "Endangered" ? "red" : scannedData.status != "Least Concern" ? "orange" : "green")
+  const statusTextColor = scannedData && (
+    scannedData.status.toLocaleLowerCase() === "endangered" ? "red" 
+    : scannedData.status.toLocaleLowerCase() != "least concern" ? "orange" 
+    : "green")
+    
   const [molluskSightings, setMolluskSightings] = useState<MolluskSightingsType[]>();
   const [openSightingsMap, setOpenSightingsMap] = useState<boolean>(false);
 

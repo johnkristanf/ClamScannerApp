@@ -13,8 +13,6 @@ export default function LoginForm({setLoginnedUser}: {
 
     const onSubmit: SubmitHandler<LoginCredentials> = async (data) => {
         try {
-
-            console.log("login ni")
     
             const logginedUser = await Login(data)
             console.log("logginedUser: ", logginedUser)
