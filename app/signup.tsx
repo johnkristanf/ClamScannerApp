@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ImageBackground, StyleSheet, Alert } from 'react-native';
+import { View, Text, ImageBackground, StyleSheet, Alert, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import SignupForm from '@/components/auth/SignupForm';
 import { Link, router } from 'expo-router';
 
 export default function SignupPage() {
-    const [isSignup, setIsSignup] = useState<boolean>(false);
+    const [isSignup, setIsSignup] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     useEffect(() => {
-        if (isSignup) {
+        if (isSignup == "success") {
             Alert.alert(
                 "Success",
                 "Sign up Successfully",
@@ -20,7 +21,21 @@ export default function SignupPage() {
                 ],
                 { cancelable: false }
             );
+
+        } else if (isSignup == "email_taken") {
+            Alert.alert(
+                "Failed",
+                "Email Already Taken Please choose another",
+            );
+        } else if(isSignup == "server_error"){
+            Alert.alert(
+                "Failed",
+                "Internal Server Error Occured",
+            );
         }
+
+        console.log("isSignup: ", isSignup);
+        
     }, [isSignup]);
 
     return (
@@ -39,11 +54,24 @@ export default function SignupPage() {
 
                 </View>
 
-                <SignupForm setIsSignup={setIsSignup} />
+                <SignupForm setIsSignup={setIsSignup} setIsLoading={setIsLoading} />
 
                 
-
             </View>
+
+            {
+                isLoading && (
+                <Modal visible={isLoading} transparent={true} animationType="fade">
+                    <TouchableOpacity style={styles.modalBackground} onPress={() => setIsLoading(false)}>
+                    <View style={styles.modalContainer}>
+                        <ActivityIndicator size="large" color="#0000ff" />
+                        <Text style={styles.modalText}>Registering...</Text>
+                    </View>
+                    </TouchableOpacity>
+                </Modal>
+             
+            )
+          }
 
         </ImageBackground>
     );
@@ -81,4 +109,26 @@ const styles = StyleSheet.create({
         color: 'blue',
         textDecorationLine: 'underline',
     },
+
+    modalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)', // Semi-transparent background
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      modalContainer: {
+        width: 200,
+        height: 150,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+      },
+      modalText: {
+        marginTop: 20,
+        fontSize: 18,
+        fontWeight: '500',
+      },
+    
 });

@@ -6,14 +6,19 @@ import Colors from "@/constants/Colors";
 import { SignupCredentials } from "@/types/auth";
 import { Signup } from "@/api/post/auth";
 
-export default function SignupForm({setIsSignup}: {
-    setIsSignup: React.Dispatch<React.SetStateAction<boolean>>
+export default function SignupForm({setIsSignup, setIsLoading}: {
+    setIsSignup: React.Dispatch<React.SetStateAction<string>>,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
 }) {
 
-    const { control, handleSubmit, reset } = useForm<SignupCredentials>();
+    const { control, handleSubmit, reset, trigger } = useForm<SignupCredentials>();
 
     const onSubmit: SubmitHandler<SignupCredentials> = async (data) => {
+        
+        setIsLoading(true)
+
         try {
+
             const signupFormData = new FormData();
             data.role = "user";
             console.log("data", data);
@@ -25,12 +30,26 @@ export default function SignupForm({setIsSignup}: {
             signupFormData.append('role', data.role);
 
             const isSignup = await Signup(signupFormData)
-            if(isSignup) setIsSignup(true)
+            console.log("isSignup sa form: ", isSignup);
+            
+            if(isSignup == "success"){
+                setIsSignup("success")
+                setIsLoading(false)
+
+            } else if(isSignup == "email_taken"){
+                setIsSignup("email_taken")
+                setIsLoading(false)
+
+            } else if(isSignup == "server_error") {
+                setIsSignup("server_error")
+                setIsLoading(false)
+            } 
 
             reset();
             
         } catch (error) {
             console.error(error);
+            setIsLoading(false)
         }
     };
 

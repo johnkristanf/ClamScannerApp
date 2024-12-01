@@ -24,9 +24,14 @@
       "permissions": [
         "INTERNET",
         "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION"
-      ]
+        "ACCESS_COARSE_LOCATION"
+      ],
+
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDlgGqUgdx7y6XqEybrvh0O21KtsRbV2HU"
+        }
+      }
     },
     "web": {
       "bundler": "metro",

@@ -1,4 +1,4 @@
-import MapView, { Marker, Callout, UrlTile } from 'react-native-maps';
+import MapView, { Marker, Callout } from 'react-native-maps';
 import { StyleSheet, View, Text, Image } from 'react-native';
 
 import { FetchReports } from '@/api/get/reports';
@@ -6,8 +6,7 @@ import { RegionType, ReportedCasesTypes } from '@/types/reports';
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
 import React, { useEffect, useRef } from 'react';
 
-const ReportsMap = ({region}: { region: RegionType }) => {
-
+const ReportsMap = ({ region }: { region: RegionType }) => {
   const { data }: UseQueryResult<ReportedCasesTypes[], Error> = useQuery({
     queryKey: ['reports'],
     queryFn: FetchReports,
@@ -22,21 +21,11 @@ const ReportsMap = ({region}: { region: RegionType }) => {
 
   return (
     <View style={styles.container}>
-
       <MapView 
         region={region} 
         ref={mapRef} 
         style={styles.map}
-        mapType="none"  
       >
-
-        <UrlTile
-          urlTemplate="https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
-          maximumZ={120}  
-          flipY={false}
-          
-        />
-
         {/* Render Markers */}
         {reports && reports?.map((report) => (
           <Marker
@@ -60,7 +49,6 @@ const ReportsMap = ({region}: { region: RegionType }) => {
             </Callout>
           </Marker>
         ))}
-
       </MapView>
 
       <View style={styles.legendContainer}>

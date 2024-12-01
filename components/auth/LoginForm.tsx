@@ -6,26 +6,40 @@ import Colors from "@/constants/Colors";
 import { LoginCredentials } from "@/types/auth";
 import { Login } from "@/api/post/auth";
 
-export default function LoginForm({setLoginnedUser}: {
-    setLoginnedUser: React.Dispatch<React.SetStateAction<string | undefined>>
+export default function LoginForm({setLoginnedUser, setIsLoading}: {
+    setLoginnedUser: React.Dispatch<React.SetStateAction<string | undefined>>,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean | undefined>>,
 }) {
     const { control, handleSubmit, reset } = useForm<LoginCredentials>();
 
     const onSubmit: SubmitHandler<LoginCredentials> = async (data) => {
         try {
+
+            setIsLoading(true)
     
             const logginedUser = await Login(data)
             console.log("logginedUser: ", logginedUser)
+
+            if(logginedUser == "login_failure"){
+                setLoginnedUser("login_failure")
+                setIsLoading(false)
+                reset();  
+
+                return 
+            }
     
             if(logginedUser){
                 setLoginnedUser(logginedUser)
+                setIsLoading(false)
                 reset();  
             } 
                       
         } catch (error) {
             console.error(error)
+            setIsLoading(false)
+
         }
-    };
+    };    
 
     return (
         <View style={styles.auth_container}>
