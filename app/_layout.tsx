@@ -55,9 +55,11 @@ function RootLayoutNav() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="signup" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="guest_mode" options={{ headerShown: false }} />
 
         <Stack.Screen name="(users)" options={{ headerShown: false }} />
         <Stack.Screen name="(personnel)" options={{ headerShown: false }} />
+        <Stack.Screen name="(verification)" options={{ headerShown: false }} />
 
       </Stack>
 

@@ -1,3 +1,4 @@
+import { Location } from "@/types/reports";
 import { requestForegroundPermissionsAsync, getCurrentPositionAsync, reverseGeocodeAsync } from "expo-location";
 
 interface Address {
@@ -6,7 +7,7 @@ interface Address {
     district: string;
 }
   
-export const getLocation = async (): Promise<{ latitude: number; longitude: number } | null> => {
+export const getLocation = async (): Promise<Location | null> => {
 
     let { status } = await requestForegroundPermissionsAsync();
 
@@ -34,11 +35,13 @@ export const getAddressFromLocation = async (latitude: number, longitude: number
         });
 
         if (result.length > 0) {
-            const { city, region, district } = result[0];
+            console.log("result: ", result);
+            
+            const { city, subregion, district } = result[0];
 
             address = {
                 city: city || '',
-                province: region || '',
+                province: subregion || '',
                 district: district || '',
             };
 

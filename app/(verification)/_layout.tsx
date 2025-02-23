@@ -23,14 +23,14 @@ export default function UsersLayout() {
         headerShown: useClientOnlyValue(false, true),
       }}>
 
+        
+
         <Stack.Screen
-          name="scan"
+          name="verification"
           options={{
             headerShown: false
           }}
         />
-
-       
 
       
     </Stack>

@@ -1,7 +1,7 @@
 import { OpenCamera } from "@/components/OpenCamera";
 import { ScannedImageResult } from "@/components/scan/ScannedResult";
 import { Scanning } from "@/components/scan/Scanning";
-import { MolluskScannedDetails } from "@/types/reports";
+import { Location, MolluskScannedDetails } from "@/types/reports";
 import { useCameraPermissions } from "expo-camera";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, ImageBackground, Image, Pressable } from "react-native";
@@ -9,13 +9,17 @@ import { openGallery } from "@/helpers/open_gallery";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
 
-export default function ScanPage() {
+
+
+export default  function ScanPage() {
 
     const [scannedData, setScannedData] = useState<MolluskScannedDetails | undefined>();
     const [isOpenCamera, setIsOpenCamera] = useState<boolean>(false);
     const [imageForScanning, setImageForScanning] = useState<string>();
+    const [isCodeSent, setIsCodeSent] = useState<boolean>(false);
 
     const [cancelOrReported, setCancelOrReported] = useState<boolean>(false);
+    const [capturedImageLocation, setCapturedImageLocation] = useState<Location | undefined>();
 
     const [_, requestPermission] = useCameraPermissions();
 
@@ -33,7 +37,14 @@ export default function ScanPage() {
             setCancelOrReported(false)
         }
 
-    }, [cancelOrReported])
+        if(isCodeSent){
+            router.replace('/(verification)/verification'); 
+        }
+
+    }, [cancelOrReported, isCodeSent]);
+
+
+    console.log("isCodeSent: ", isCodeSent)
 
     return (
         <ImageBackground
@@ -70,6 +81,8 @@ export default function ScanPage() {
                     scannedData={scannedData} 
                     imageForScanning={imageForScanning}
                     setCancelOrReported={setCancelOrReported}
+                    setIsCodeSent={setIsCodeSent}
+                    capturedImageLocation={capturedImageLocation}
                 />
 
             ) : (
@@ -85,7 +98,7 @@ export default function ScanPage() {
 
                     <Pressable
                         style={styles.flex_row_center}
-                        onPress={() => openGallery(setImageForScanning, setScannedData, setCancelOrReported)}
+                        onPress={() => openGallery(setImageForScanning, setScannedData, setCancelOrReported, setCapturedImageLocation)}
                     >
                         <Image source={require('../../assets/images/open_gallery_icon.png')} />
                         <Text style={styles.text}>Upload Gallery</Text>

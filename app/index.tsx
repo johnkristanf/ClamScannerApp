@@ -22,6 +22,10 @@ export default function LandingPage() {
                     <Link href="/signup" style={styles.get_started}>Get Started</Link>
                 </View>
 
+                <View style={styles.guest_mode_container}>
+                    <Link href="/guest_mode" style={styles.get_started}>Guest Mode</Link>
+                </View>
+
                 <Text style={styles.already_signup}>
                     Already Have an Account?
                     <Link href="/login" style={{fontWeight: 'bold', textDecorationLine: 'underline'}}>Login</Link>
@@ -69,6 +73,13 @@ const styles = StyleSheet.create({
         padding: 8,
         width: '70%',
 
+    },
+
+    guest_mode_container: {
+        backgroundColor: '#000',
+        borderRadius: 8,
+        padding: 8,
+        width: '70%',
     },
 
     get_started: {

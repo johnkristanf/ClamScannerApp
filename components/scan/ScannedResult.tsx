@@ -1,4 +1,4 @@
-import { MolluskScannedDetails } from "@/types/reports";
+import { Location, MolluskScannedDetails } from "@/types/reports";
 
 import { View, Text, Image, Pressable, StyleSheet, Alert, PanResponder, PanResponderInstance, Animated } from "react-native";
 import { getData } from "@/helpers/store";
@@ -12,13 +12,20 @@ import { useEffect, useMemo, useRef, useState, lazy, Suspense } from "react";
 
 import { MolluskSightingsType } from "@/types/mollusk";
 
+import { ActivityIndicator } from "react-native";
+
+import moment from 'moment-timezone';
+import { IsEmailVerified, SendVerificationCode } from "@/api/post/verification";
+
 const MolluskSightingsMap = lazy(() => import('../SightingsMap'));
 
 
-export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrReported }: { 
+export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrReported, setIsCodeSent, capturedImageLocation }: { 
   scannedData: MolluskScannedDetails | undefined,
   imageForScanning: string | undefined,
-  setCancelOrReported: React.Dispatch<React.SetStateAction<boolean>>
+  setCancelOrReported: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsCodeSent: React.Dispatch<React.SetStateAction<boolean>>,
+  capturedImageLocation: Location | undefined
 }){
 
   const statusTextColor = scannedData && (
@@ -28,6 +35,7 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
     
   const [molluskSightings, setMolluskSightings] = useState<MolluskSightingsType[]>();
   const [openSightingsMap, setOpenSightingsMap] = useState<boolean>(false);
+  const [isCodeSending, setIsCodeSending] = useState<boolean>(false);
 
 
   const commonSightingsMemo = useMemo(() => {
@@ -42,8 +50,6 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
   }, [commonSightingsMemo]);
 
  
-
-  
   const report = async () => {
     
       try {
@@ -54,7 +60,13 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
 
           const user_id = parseInt(stored_uID, 10);
     
-          const location = await getLocation();
+          let location: Location | undefined | null;
+
+          if(!capturedImageLocation){
+            location = await getLocation();
+          } else {
+            location = capturedImageLocation
+          }
 
           if (!location) {
             console.log('Failed to get location');
@@ -63,7 +75,12 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
     
           const { latitude, longitude } = location;
           const address = await getAddressFromLocation(latitude, longitude);
-    
+      
+          const currentDate = moment().tz('Asia/Manila').format('MMMM D, YYYY hh:mm A');
+
+          console.log("currentDate: ", currentDate);  // Outputs the date in Asia/Manila timezone
+            
+
           const reportDetails = {
             longitude,
             latitude,
@@ -72,6 +89,7 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
             district: address.district,
             mollusk_type: scannedData?.mollusk_name,
             user_id,
+            reported_at: currentDate
           };
     
           REPORT(reportDetails).catch((err) => console.log(err));
@@ -134,6 +152,70 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
       }).start();
     };
 
+   
+    useEffect(() => {
+
+      async function getUserEmail() {
+        const email = await getData('email')
+        console.log("email: ", email);
+
+        const isVerified = await IsEmailVerified(email || '')
+        
+
+        if(!isVerified){
+          const verificationMessage = "Verify your account to proceed reporting, check your email for the verification code";
+
+          Alert.alert(
+            "Account Verification Needed", 
+            verificationMessage, 
+            [
+              
+              {
+                text: "Cancel", 
+                onPress: () => setCancelOrReported(true),
+                style: "cancel", 
+              },
+
+              {
+                text: "Send Code",
+                onPress: async () => {
+                  setIsCodeSending(true)
+                  const response = await SendVerificationCode(email || '')
+
+                  if(response === "code_sent_successfully"){
+                    setIsCodeSent(true)
+                    setIsCodeSending(false)
+                  } else {
+
+                    setIsCodeSending(false)
+
+                    Alert.alert(
+                      "Verification Error",
+                      "Error in sending verification code please try again",
+                      [
+                          {
+                            text: "Back",
+                            onPress: () => setCancelOrReported(true),
+                          },
+                      ],
+                      { cancelable: false }
+                    );
+                  }
+
+                }, 
+              },
+            ],
+
+            { cancelable: false } 
+
+          );
+        }
+      }
+
+      getUserEmail()
+
+    }, [])
+
 
     return (
 
@@ -161,7 +243,15 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
 
         scannedData ? (
 
-          <Animated.View style={[styles.scan_container, { transform: [{ translateX }] }]} >
+          isCodeSending ? (
+
+            <View style={styles.sending_code_container}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+
+          ) : 
+          
+            (<Animated.View style={[styles.scan_container, { transform: [{ translateX }] }]} >
   
               <View style={styles.mollusk_details_container}>
   
@@ -197,6 +287,10 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
   
                       <Text style={[styles.text, {fontSize: 18, color: statusTextColor, marginBottom: 8, marginLeft: 4}]}>
                         {scannedData.status === "N/A" ? "" : scannedData.status}
+                      </Text>
+
+                      <Text style={[styles.text, {marginLeft: 4, fontSize: 15, marginBottom: 5}]}>
+                        Prediction Percentage: {scannedData.percentage}
                       </Text>
   
                     </View>
@@ -236,30 +330,34 @@ export function ScannedImageResult({ scannedData, imageForScanning, setCancelOrR
   
                 ) : (
                   scannedData.mollusk_name !== "Invalid Image" && (
+
+                    
+                      <View style={styles.scanned_buttons_container}>
+                        <Pressable
+                          style={styles.button_cancel}
+                          onPress={() => setCancelOrReported(true)}
+                        >
+                          <Text style={styles.text}> CANCEL </Text>
+                        </Pressable>
+
+                        <Pressable
+                          style={styles.button_report}
+                          onPress={() => report()}
+                        >
+                          <Text style={[styles.text, { color: Colors.dark.text }]}> REPORT </Text>
+
+                        </Pressable>
+                      </View>
+                    
   
-                    <View style={styles.scanned_buttons_container}>
-                      <Pressable
-                        style={styles.button_cancel}
-                        onPress={() => setCancelOrReported(true)}
-                      >
-                        <Text style={styles.text}> CANCEL </Text>
-                      </Pressable>
-
-                      <Pressable
-                        style={styles.button_report}
-                        onPress={() => report()}
-                      >
-                        <Text style={[styles.text, { color: Colors.dark.text }]}> REPORT </Text>
-
-                      </Pressable>
-                    </View>
+                    
                   )
                 )}
   
       
       
   
-          </Animated.View>
+          </Animated.View>)
           
         ) : null
       ) 
@@ -312,6 +410,15 @@ const styles = StyleSheet.create({
     height: "20%",
     borderRadius: 10,
     justifyContent: "center",
+  },
+
+  sending_code_container: {
+    width: "100%",
+    height: "100%",
+    backgroundColor: '#ffff',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   button_report: {

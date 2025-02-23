@@ -4,6 +4,8 @@ export type MolluskScannedDetails = {
     scientific_name: string
     description: string,
     status: string
+
+    percentage?: string 
 }
 
 
@@ -14,7 +16,8 @@ export type REPORT_DETAILS = {
     province: string
     district: string
     mollusk_type: string
-    user_id: number
+    user_id: number,
+    reported_at: string
 }
 
 
@@ -42,4 +45,10 @@ export type RegionType = {
     longitude: number,
     latitudeDelta: number,
     longitudeDelta: number,
+}
+
+
+export type Location = {
+    latitude: number,
+    longitude: number,
 }

@@ -43,11 +43,17 @@ export function OpenCamera({ setImageForScanning, setIsOpenCamera, setScannedDat
                         } as any);
 
                         const scanRespData = await Scan(formData, setCancelOrReported);
-                        console.log("scanRespData: ", scanRespData)
+                        console.log("scanRespData.prediction_percentage", scanRespData.prediction_percentage);
+
 
                         if (scanRespData) {
                             FetchMolluskDetails(scanRespData.mollusk_classified_result)
-                                .then(molluskDetails => setScannedData(molluskDetails))
+
+                                .then(molluskDetails => setScannedData({
+                                    ...molluskDetails,
+                                    percentage: scanRespData.prediction_percentage
+                                }))
+
                                 .catch(err => console.error(err));
 
                         } else {
